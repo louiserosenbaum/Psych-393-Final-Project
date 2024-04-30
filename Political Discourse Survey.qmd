@@ -1,0 +1,58 @@
+---
+title: "Political Discourse Survey"
+subtitle: "Authors: Louise Rosenbaum and Sebastian Eisenhuth"
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(stringr)
+```
+
+```{r}
+political_discourse_survey <- read.csv("Comfort in Political Discourse Survey (Responses).csv")
+
+names(political_discourse_survey) <- gsub("\\.", " ", names(political_discourse_survey))
+```
+
+```{r}
+# Function to handle multiple responses and compute average score
+convert_scale <- function(x) {
+  sapply(x, function(y) {
+    responses <- strsplit(as.character(y), ";\\s*")[[1]]  # Split multiple responses
+    scores <- as.numeric(factor(responses, levels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"), labels = c(1, 2, 3, 4)))
+    if (length(scores) > 0) mean(scores) else NA  # Compute average score or return NA if no responses
+  })
+}
+
+# Apply the conversion to relevant columns
+political_discourse_survey <- political_discourse_survey %>%
+  mutate(across(
+    .cols = starts_with("I see myself as:"),
+    .fns = convert_scale))
+
+# View the transformed dataset
+view(political_discourse_survey)
+```
+
+```{r}
+# Compute the mean score for each personality trait
+#Generate each of the scores per person (ignore the NAs)
+extravesrsion ( extraversion/quite scores)
+openess ( open to new expriences, unvreaetive conventional)
+consicousness ( disorganized, careless, impulsive, depenabilty)
+agreeableness ( critical, symapthetic)
+nurotcism ( anxious, calm emtoional stable)
+```
+
+```{r}
+#Correlation with the people listed (0 to 3)
+```
+
+```{r}
+#Pair each question to the variables we are interested in and start by making simplier graphs
+
+```
+
