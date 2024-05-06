@@ -1,4 +1,4 @@
----
+v---
 title: "Political Discourse Survey"
 subtitle: "Authors: Louise Rosenbaum and Sebastian Eisenhuth"
 ---
@@ -14,18 +14,74 @@ library(stringr)
 ```{r}
 political_discourse_survey <- read.csv("Comfort in Political Discourse Survey (Responses).csv")
 
-names(political_discourse_survey) <- gsub("\\.", " ", names(political_discourse_survey))
+names(political_discourse_survey) <- gsub("\\.", "", names(political_discourse_survey))
 ```
 
 ```{r}
-# Function to handle multiple responses and compute average score
-convert_scale <- function(x) {
-  sapply(x, function(y) {
-    responses <- strsplit(as.character(y), ";\\s*")[[1]]  # Split multiple responses
-    scores <- as.numeric(factor(responses, levels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"), labels = c(1, 2, 3, 4)))
-    if (length(scores) > 0) mean(scores) else NA  # Compute average score or return NA if no responses
-  })
-}
+cleaned_political_discourse <- political_discourse_survey |>
+  rename(extraverted_enthusiastic = IseemyselfasExtravertedenthusiatic, 
+         critical_quarrelsome = IseemyselfasCriticalquarrelsome,
+         dependable = IseemyselfasDependableselfdisciplined, 
+         anxious = IseemyselfasAnxiouseasilyupset, 
+         new_experiences = IseemyselfasOpentonewexperiencescomplex,
+         reserved_quiet = IseemyselfasReservedquiet,
+         sympathetic = IseemyselfasSympatheticwarm,
+         disorganized = IseemyselfasDisorganizedcareless,
+         calm = IseemyselfasCalmemotionallystable,
+         conventional = IseemyselfasConventionaluncreative, 
+         childhood_relations = WhowereyourpeopleduringchildhoodWhowerethethreepeoplewhoyouinteractedwiththemostduringK12educationHowareyourelatedparentsfriendsetcDidyourpoliticalbeliefsalignwiththispersonssDidyouknowiftheyidentifiedwithapoliticalpartySampleresponseMyclosestpeopleweremymomstrongdemocratfriendstrongrepublicanandfriendNAIdontknowifallofthemarecommittedtoapoliticalpartybutIdoknowthatmymomispartoftheDemocraticFarmerLaborPartyinMNandhasvotedmoreliberalsinceDonaldTrumptookofficeWithmyfriendwestoppedtalkingaboutpoliticsafterXbecauseourrelationshipgottobetootimidwhereaswithmyotherfriendweendedupbeingcloserbecausewesharedthesamebeliefsafterXhappened, 
+         current_relations = WhoareyourpeopleWhoarethethreepeoplewhoyouinteractwiththemostHowareyourelatedparentsfriendsetcDoyourpoliticalbeliefsalignwiththispersonssDoyouknowiftheyidentifywhatpoliticalpartyisSampleresponseMyclosestpeoplearemymomstrongdemocratroommatestrongrepublicanandcousinmoderateIdontknowifallofthemarecommittedtoapoliticalpartybutIdoknowthatmymomispartoftheDemocraticFarmerLaborPartyinMNandhasvotedmoreliberalsinceDonaldTrumptookofficeWithmyroommateItrytoavoidtalkingaboutpoliticssoIamunsureiftheyarecommittedtoapoliticalpartyandsameformycousin, 
+         pol_participation = HowoftendoyouparttakeinthepoliticalprocessPrimariesCaucusingVoting, 
+         news_freq = Howoftendoyoureadthenews, 
+         candidate_knowledge = WouldyousayyouareknowledgeableaboutcandidatesPresidentialStateCountyTown, 
+         vote_importance = Doyoufeelthatyourindividualvotematters)
+```
+
+```{r}
+cleaned_political_discourse <- cleaned_political_discourse |>
+  rename(cant_help_needy = TowhatextentdoyouagreewiththestatementthatThegovernmenttodaycantaffordtodomuchmoretohelptheneedyOpinion,
+         assoc_accept_homosexuality = TowhatextentdoyouagreethatHomosexualityshouldbeacceptedbysocietyOpinion,
+         govt_reg_business_harm = TowhatextentdoyouagreethatGovernmentregulationofbusinessdoesmoreharmthangoodOpinion,
+         poor_easy_life = TowhatextentdoyouagreethatPoorpeopletodayhaveiteasybecausetheycangetgovernmentbenefitswithoutdoingmuchinreturnOpinion,
+         govt_waste = TowhatextentdoyouagreethatGovernmentiswastefulandinefficientOpinion,
+         diplomacy_peace = TowhatextentdoyouagreethatGooddiplomacyisthebestwaytoensurepeaceOpinion,
+         black_self_responsibility = TowhatextentdoyouagreethatBlackAmericanswhocantgetaheadaremostlyresponsiblefortheirownconditionOpinion,
+         env_laws_job_cost = TowhatextentdoyouagreethatStricterenvironmentallawsandregulationscosttoomanyjobsandhurttheeconomyOpinion,
+         poor_hard_life = TowhatextentdoyouagreethatPoorpeoplehavehardlivesbecausegovernmentbenefitsdontgofarenoughtohelpthemlivedecentlyOpinion,
+         govt_underappreciated = TowhatextentdoyouagreethatGovernmentdoesabetterjobthanpeoplegiveitcreditforOpinion,
+         govt_reg_necessary = TowhatextentdoyouagreethatGovernmentregulationofbusinessisnecessarytoprotectthepublicinterestOpinion,
+         immigrants_strength = TowhatextentdoyouagreethatImmigrantstodaystrengthenourcountrybecauseoftheirhardworkandtalentsOpinion,
+         peace_military_strength = TowhatextentdoyouagreethatThebestwaytoensurepeaceisthroughmilitarystrengthOpinion,
+         corp_profits_excess = TowhatextentdoyouagreethatBusinesscorporationsmaketoomuchprofitOpinion,
+         racial_discrimination = TowhatextentdoyouagreethatRacialdiscriminationisthemainreasonforracialdisparitiesbetweenBlackandWhiteAmericansOpinion)
+```
+
+```{r}
+cleaned_political_discourse <- cleaned_political_discourse |>
+  rename(need_to_help_needy_debt = TowhatextentdoyouagreethatThegovernmentshoulddomoretohelpneedyAmericansevenifitmeansgoingdeeperintodebtOpinion,
+         env_laws_worth = TowhatextentdoyouagreethatStricterenvironmentallawsandregulationsareworththecostOpinion,
+         discourage_homosexuality = TowhatextentdoyouagreethatHomosexualityshouldbediscouragedbysocietyOpinion,
+         immigrants_burden = TowhatextentdoyouagreethatImmigrantstodayareaburdenonourcountrybecausetheytakeourjobshousingandhealthcareOpinion,
+         corp_profits_fair = TowhatextentdoyouagreethatMostcorporationsmakeafairandreasonableamountofprofitOpinion,
+         transgender_bathroom = TowhatextentdoyouagreethatTransgenderindividualsshouldbeabletousethebathroomofthegendertheyidentifywithOpinion)
+
+         comfort_discussing_politics = ReflectingonthetopicsdiscussedinthissurveyhowcomfortabledoyoufeeldiscussingthesesubjectswithpeersorfamilyOpinion,
+         pol_convo_stress = HowoftendopoliticalconversationsleadtostressoranxietyforyouOpinion,
+         pol_affect_stress = TowhatdegreedoyoufeelthatpoliticsaffectsyourdailystresslevelsOpinion)
+```
+
+```{r}
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(across(c(extraverted_enthusiastic, critical_quarrelsome, dependable, anxious, new_experiences, reserved_quiet, sympathetic, disorganized, calm, conventional),
+                ~recode(., "Strongly disagree" = 1, "Disagree" = 2, "Agree" = 3, "Strongly agree" = 4))) |>
+  view()
+```
+
+```{r}
+scores <- as.numeric(factor(responses, levels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"), labels = c(1, 2, 3, 4)))
+
+cleaned_data <- convert_scale(political_discourse_survey) |>
+  view()
 
 # Apply the conversion to relevant columns
 political_discourse_survey <- political_discourse_survey %>%
@@ -45,10 +101,29 @@ openess ( open to new expriences, unvreaetive conventional)
 consicousness ( disorganized, careless, impulsive, depenabilty)
 agreeableness ( critical, symapthetic)
 nurotcism ( anxious, calm emtoional stable)
+
+Extraversion: 1, 6R; Agreeableness: 2R, 7; Conscientiousness; 3, 8R; Emotional Stability: 4R, 9; Openness to Experiences: 5, 10R.  
+
+
+
+political_discourse_survey %>%
+  mutate(
+    extraversion = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Extraverted, enthusiastic"))),
+    agreeableness = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Critical, quarrelsome"))),
+    conscientiousness = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Dependable, self-disciplined"))),
+    emotional_stability = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Anxious, easily upset"))),
+    openness_to_experiences = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Open to new experiences, complex")))
+  ) |>
+  view()
+```
+
+```{r}
 ```
 
 ```{r}
 #Correlation with the people listed (0 to 3)
+
+
 ```
 
 ```{r}
