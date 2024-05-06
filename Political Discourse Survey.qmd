@@ -1,6 +1,6 @@
-v---
+---
 title: "Political Discourse Survey"
-subtitle: "Authors: Louise Rosenbaum and Sebastian Eisenhuth"
+subtitle: "Author: Louise Rosenbaum"
 ---
 
 ```{r}
@@ -9,6 +9,8 @@ library(ggplot2)
 library(dplyr)
 library(readr)
 library(stringr)
+library(viridis)
+library(ggforce)
 ```
 
 ```{r}
@@ -34,100 +36,220 @@ cleaned_political_discourse <- political_discourse_survey |>
          pol_participation = HowoftendoyouparttakeinthepoliticalprocessPrimariesCaucusingVoting, 
          news_freq = Howoftendoyoureadthenews, 
          candidate_knowledge = WouldyousayyouareknowledgeableaboutcandidatesPresidentialStateCountyTown, 
-         vote_importance = Doyoufeelthatyourindividualvotematters)
+         vote_importance = Doyoufeelthatyourindividualvotematters,
+         cant_help_needy = TowhatextentdoyouagreewiththestatementthatThegovernmenttodaycantaffordtodomuchmoretohelptheneedyOpinion,
+         assoc_accept_homosexuality = TowhatextentdoyouagreewiththestatementthatHomosexualityshouldbeacceptedbysocietyOpinion,
+         govt_reg_business_harm = TowhatextentdoyouagreewiththestatementthatGovernmentregulationofbusinessdoesmoreharmthangoodOpinion,
+         poor_easy_life = TowhatextentdoyouagreewiththestatementthatPoorpeopletodayhaveiteasybecausetheycangetgovernmentbenefitswithoutdoingmuchinreturnOpinion,
+         govt_waste = TowhatextentdoyouagreewiththestatementthatGovernmentiswastefulandinefficientOpinion,
+         diplomacy_peace = TowhatextentdoyouagreewiththestatementthatGooddipomacyisthebestwaytoensurepeaceOpinion,
+         black_self_responsibility = TowhatextentdoyouagreewiththestatementthatBlackAmericanswhocantgetaheadinthiscountryaremostlyresponsiblefortheirownconditionOpinion,
+         env_laws_job_cost = TowhatextentdoyouagreewiththestatementthatStricterenviromentallawsandregulationscosttoomanyjobsandhurttheeconomyOpinion,
+         poor_hard_life = TowhatextentdoyouagreewiththestatementthatPoorpeoplehavehardlivesbecausegovernmentbenefitsdontgofarenoughtohelpthemlivedecentlyOpinion,
+         govt_underappreciated = TowhatextentdoyouagreewiththestatementthatGovernmentdoesabetterjobthanpeoplegiveitcreditforOpinion,
+         govt_reg_necessary = TowhatextentdoyouagreewiththestatementthatGovernmentregulationofbusinessisnecessarytoprotectthepublicinterestOpinion,
+         immigrants_strength = TowhatextentdoyouagreewiththestatementthatImmigrantstodaystrengthenourcountrybecauseoftheirhardworkandtalentsOpinion,
+         peace_military_strength = TowhatextentdoyouagreewiththestatementthatThebestwaytoensurepeaceisthroughmilitarystrengthOpinion,
+         corp_profits_excess = TowhatextentdoyouagreewiththestatementthatBusinesscorporationsmaketoomuchprofitOpinion,
+         racial_discrimination = TowhatextentdoyouagreewiththestatementthatRacialdiscriminationisthemainreasonforracialdisparitiesbetweenblackandwhiteAmericansOpinion,
+         need_to_help_needy_debt = TowhatextentdoyouagreewiththestatementthatThegovernmentshoulddomoretohelpneedyAmericansevenifitmeansgoingdeeperintodeptOpinion,
+         env_laws_worth = TowhatextentdoyouagreewiththestatementthatStricterenviromentallawsandregulationsareworththecostOpinion,
+         discourage_homosexuality = TowhatextentdoyouagreewiththestatementthatHomosexualityshouldbediscouragedbysocietyOpinion,
+         immigrants_burden = TowhatextentdoyouagreewiththestatementthatImmigrantstodayareaburdenonourcountrybecausetheytakeourjobshousingandheathcareOpinion,
+         corp_profits_fair = TowhatextentdoyouagreewiththestatementthatTransgenderindividualsshouldbeabletousethebathroomofthegendertheyidentifywithOpinion,
+         transgender_bathroom = TowhatextentdoyouagreewiththestatementthatTransgenderindividualsshouldbeabletousethebathroomofthegendertheyidentifywithOpinion,
+         comfort_discussing_politics = Reflectingonthetopicsdiscussedinthissurveyhowcomfortabledoyoufeeldiscussingthesesubjectswithpeersorfamily,
+         pol_convo_stress = Howoftendopoliticalconversationsleadtostressoranxietyforyou,
+         pol_affect_stress = Towhatdegreedoyoufeelthatpoliticsaffectsyourdailystresslevels,
+         poor_people_easy = TowhatextentdoyouagreewiththestatementthatPoorpeopletodayhaveiteasybecausetheycangetgovernmentbenefitswithoutdoingmuchinreturnOpinion1,
+         corp_excess_profits = TowhatextentdoyouagreewiththestatementthatMostcorporationsmakeafairandreasonableamountofprofitOpinion)
 ```
 
 ```{r}
-cleaned_political_discourse <- cleaned_political_discourse |>
-  rename(cant_help_needy = TowhatextentdoyouagreewiththestatementthatThegovernmenttodaycantaffordtodomuchmoretohelptheneedyOpinion,
-         assoc_accept_homosexuality = TowhatextentdoyouagreethatHomosexualityshouldbeacceptedbysocietyOpinion,
-         govt_reg_business_harm = TowhatextentdoyouagreethatGovernmentregulationofbusinessdoesmoreharmthangoodOpinion,
-         poor_easy_life = TowhatextentdoyouagreethatPoorpeopletodayhaveiteasybecausetheycangetgovernmentbenefitswithoutdoingmuchinreturnOpinion,
-         govt_waste = TowhatextentdoyouagreethatGovernmentiswastefulandinefficientOpinion,
-         diplomacy_peace = TowhatextentdoyouagreethatGooddiplomacyisthebestwaytoensurepeaceOpinion,
-         black_self_responsibility = TowhatextentdoyouagreethatBlackAmericanswhocantgetaheadaremostlyresponsiblefortheirownconditionOpinion,
-         env_laws_job_cost = TowhatextentdoyouagreethatStricterenvironmentallawsandregulationscosttoomanyjobsandhurttheeconomyOpinion,
-         poor_hard_life = TowhatextentdoyouagreethatPoorpeoplehavehardlivesbecausegovernmentbenefitsdontgofarenoughtohelpthemlivedecentlyOpinion,
-         govt_underappreciated = TowhatextentdoyouagreethatGovernmentdoesabetterjobthanpeoplegiveitcreditforOpinion,
-         govt_reg_necessary = TowhatextentdoyouagreethatGovernmentregulationofbusinessisnecessarytoprotectthepublicinterestOpinion,
-         immigrants_strength = TowhatextentdoyouagreethatImmigrantstodaystrengthenourcountrybecauseoftheirhardworkandtalentsOpinion,
-         peace_military_strength = TowhatextentdoyouagreethatThebestwaytoensurepeaceisthroughmilitarystrengthOpinion,
-         corp_profits_excess = TowhatextentdoyouagreethatBusinesscorporationsmaketoomuchprofitOpinion,
-         racial_discrimination = TowhatextentdoyouagreethatRacialdiscriminationisthemainreasonforracialdisparitiesbetweenBlackandWhiteAmericansOpinion)
-```
+cleaned_political_discourse$extraverted_enthusiastic <- as.factor(cleaned_political_discourse$extraverted_enthusiastic)
 
-```{r}
-cleaned_political_discourse <- cleaned_political_discourse |>
-  rename(need_to_help_needy_debt = TowhatextentdoyouagreethatThegovernmentshoulddomoretohelpneedyAmericansevenifitmeansgoingdeeperintodebtOpinion,
-         env_laws_worth = TowhatextentdoyouagreethatStricterenvironmentallawsandregulationsareworththecostOpinion,
-         discourage_homosexuality = TowhatextentdoyouagreethatHomosexualityshouldbediscouragedbysocietyOpinion,
-         immigrants_burden = TowhatextentdoyouagreethatImmigrantstodayareaburdenonourcountrybecausetheytakeourjobshousingandhealthcareOpinion,
-         corp_profits_fair = TowhatextentdoyouagreethatMostcorporationsmakeafairandreasonableamountofprofitOpinion,
-         transgender_bathroom = TowhatextentdoyouagreethatTransgenderindividualsshouldbeabletousethebathroomofthegendertheyidentifywithOpinion)
+cleaned_political_discourse$critical_quarrelsome <-
+  as.factor(cleaned_political_discourse$critical_quarrelsome)
 
-         comfort_discussing_politics = ReflectingonthetopicsdiscussedinthissurveyhowcomfortabledoyoufeeldiscussingthesesubjectswithpeersorfamilyOpinion,
-         pol_convo_stress = HowoftendopoliticalconversationsleadtostressoranxietyforyouOpinion,
-         pol_affect_stress = TowhatdegreedoyoufeelthatpoliticsaffectsyourdailystresslevelsOpinion)
+cleaned_political_discourse$dependable <- 
+  as.factor(cleaned_political_discourse$dependable)
+
+cleaned_political_discourse$anxious <- 
+  as.factor(cleaned_political_discourse$anxious)
+
+cleaned_political_discourse$new_experiences <- 
+  as.factor(cleaned_political_discourse$new_experiences)
+
+cleaned_political_discourse$reserved_quiet <- 
+  as.factor(cleaned_political_discourse$reserved_quiet)
+
+cleaned_political_discourse$sympathetic <- 
+  as.factor(cleaned_political_discourse$sympathetic)
+
+cleaned_political_discourse$disorganized <- 
+  as.factor(cleaned_political_discourse$disorganized)
+
+cleaned_political_discourse$calm <- 
+  as.factor(cleaned_political_discourse$calm)
+
+cleaned_political_discourse$conventional <- 
+  as.factor(cleaned_political_discourse$conventional)
 ```
 
 ```{r}
 cleaned_political_discourse <- cleaned_political_discourse |>
   mutate(across(c(extraverted_enthusiastic, critical_quarrelsome, dependable, anxious, new_experiences, reserved_quiet, sympathetic, disorganized, calm, conventional),
-                ~recode(., "Strongly disagree" = 1, "Disagree" = 2, "Agree" = 3, "Strongly agree" = 4))) |>
-  view()
+                ~recode(., "Strongly disagree" = 1, "Disagree" = 2, "Agree" = 3, "Strongly agree" = 4)))
 ```
 
 ```{r}
-scores <- as.numeric(factor(responses, levels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"), labels = c(1, 2, 3, 4)))
-
-cleaned_data <- convert_scale(political_discourse_survey) |>
-  view()
-
-# Apply the conversion to relevant columns
-political_discourse_survey <- political_discourse_survey %>%
-  mutate(across(
-    .cols = starts_with("I see myself as:"),
-    .fns = convert_scale))
-
-# View the transformed dataset
-view(political_discourse_survey)
+cleaned_political_discourse$critical_quarrelsome <- 5-cleaned_political_discourse$critical_quarrelsome
+cleaned_political_discourse$anxious <- 5-cleaned_political_discourse$anxious
+cleaned_political_discourse$reserved_quiet <- 5-cleaned_political_discourse$reserved_quiet
+cleaned_political_discourse$disorganized <- 5-cleaned_political_discourse$disorganized
+cleaned_political_discourse$conventional <- 5-cleaned_political_discourse$conventional
 ```
 
 ```{r}
-# Compute the mean score for each personality trait
-#Generate each of the scores per person (ignore the NAs)
-extravesrsion ( extraversion/quite scores)
-openess ( open to new expriences, unvreaetive conventional)
-consicousness ( disorganized, careless, impulsive, depenabilty)
-agreeableness ( critical, symapthetic)
-nurotcism ( anxious, calm emtoional stable)
-
-Extraversion: 1, 6R; Agreeableness: 2R, 7; Conscientiousness; 3, 8R; Emotional Stability: 4R, 9; Openness to Experiences: 5, 10R.  
-
-
-
-political_discourse_survey %>%
-  mutate(
-    extraversion = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Extraverted, enthusiastic"))),
-    agreeableness = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Critical, quarrelsome"))),
-    conscientiousness = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Dependable, self-disciplined"))),
-    emotional_stability = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Anxious, easily upset"))),
-    openness_to_experiences = rowMeans(select(political_discourse_survey, starts_with("I see myself as: Open to new experiences, complex")))
-  ) |>
-  view()
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(comfort_discussing_politics =
+         recode(comfort_discussing_politics, "Very uncomfortable" = 1, "Somewhat uncomfortable" = 2, "Somewhat comfortable" = 3, "Very comfortable" = 4)) |>
+  mutate(pol_convo_stress =
+         recode(pol_convo_stress, "Never" = 1, "Almost never" = 2, "Most of the time" = 3, "Almost always" = 4)) |>
+  mutate(pol_affect_stress =
+         recode(pol_affect_stress, "Significantly increases my stress" = 1, "Somewhat increases my stress" = 2, "Somewhat decreases my stress" = 3, "Significantly decreases my stress" = 4))
 ```
 
 ```{r}
+cleaned_political_discourse <- cleaned_political_discourse |> 
+  mutate(total_comfortability = pol_convo_stress + pol_affect_stress + comfort_discussing_politics)
 ```
 
 ```{r}
-#Correlation with the people listed (0 to 3)
+#Combining columns to create the Big Five personality traits
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(extraversion = extraverted_enthusiastic +  reserved_quiet)
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(agreeableness = critical_quarrelsome + sympathetic)
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(conscientiousness = dependable + disorganized)
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(emotional_stability = anxious + calm)
+cleaned_political_discourse <- cleaned_political_discourse |>
+  mutate(openness = new_experiences + conventional)
+
+cleaned_political_discourse |>
+  pivot_longer(cols = c(extraversion, agreeableness, conscientiousness, emotional_stability, openness), names_to = "trait", values_to = "score") |>
+  group_by(trait, score) |>
+  summarise(total_comfortability = mean(total_comfortability)) |>
+  ggplot(aes(x = score, y = total_comfortability, color = trait)) +
+  geom_line() +
+  labs(title = ~ bold('Big Five Personality Traits and Comfortability in Political Discourse'),
+       x = "Score",
+       y = "Total Comfortability", 
+       color = "Personality Trait") +
+  theme_minimal() +
+  scale_color_viridis(discrete = TRUE)
+```
 
 
+```{r}
+#Extroversion ANOVA
+anova_extraversion <- aov(total_comfortability ~ extraversion, data = cleaned_political_discourse)
+summary(anova_extraversion)
+
+#Agreeableness ANOVA
+anova_agreeableness <- aov(total_comfortability ~ agreeableness, data = cleaned_political_discourse)
+summary(anova_agreeableness)
+
+#Conscientiousness ANOVA
+anova_conscientiousness <- aov(total_comfortability ~ conscientiousness, data = cleaned_political_discourse)
+summary(anova_conscientiousness)
+
+#Emotional Stability ANOVA
+anova_emotional_stability <- aov(total_comfortability ~ emotional_stability, data = cleaned_political_discourse)
+summary(anova_emotional_stability)
+
+#Openness ANOVA
+anova_openness <- aov(total_comfortability ~ openness, data = cleaned_political_discourse)
+summary(anova_openness)
+```
+```{r}
+cleaned_political_discourse |>
+  filter(!is.na(conscientiousness)) |>
+  ggplot(aes(x = as.factor(conscientiousness), y = total_comfortability)) +
+  geom_boxplot(fill = "chartreuse4") +
+  labs(title = ~ bold('Conscientiousness and Comfortability in Political Discourse'),
+       x = "Conscientiousness Score",
+       y = "Total Comfortability") +
+  theme_minimal()
 ```
 
 ```{r}
-#Pair each question to the variables we are interested in and start by making simplier graphs
+cleaned_political_discourse |>
+  filter(!is.na(openness)) |>
+  ggplot(aes(x = as.factor(openness), y = total_comfortability)) +
+  geom_boxplot(fill = "chartreuse4") +
+  labs(title = ~ bold('Openness and Comfortability in Political Discourse'),
+       x = "Openness Score",
+       y = "Total Comfortability") +
+  theme_minimal()
+```
 
+```{r}
+#Interactions and comfortability
+
+close_interaction_table <- read_csv("Close Interactions and Political Comfortability - Sheet2.csv")
+
+cleaned_political_discourse %>%
+  left_join(close_interaction_table, by = join_by("Timestamp" == "Timestamp")) %>%
+  select(total_comfortability, childhood_people, current_people) %>%
+  mutate(childhood_people_short = sub("\\-.*", "", childhood_people),
+         current_people_short = sub("\\-.*", "", current_people)) %>%
+  drop_na() %>%
+  ggplot(mapping = aes(x = childhood_people_short, y = total_comfortability, color = childhood_people_short)) +
+  geom_sina() +
+  theme_bw() +
+  geom_violin(fill = NA)
+```
+
+
+```{r}
+cleaned_political_discourse %>%
+  left_join(close_interaction_table, by = join_by("Timestamp" == "Timestamp")) %>%
+  select(total_comfortability, childhood_people, current_people) %>%
+  mutate(childhood_people_short = sub("\\-.*", "", childhood_people),
+         current_people_short = sub("\\-.*", "", current_people)) %>%
+  drop_na() %>%
+  ggplot(mapping = aes(x = current_people_short, y = total_comfortability)) +
+  geom_sina() +
+  theme_bw() +
+  geom_violin(fill = NA)
+  
+  
+```
+```{r}
+cleaned_political_discourse %>%
+  left_join(close_interaction_table, by = join_by("Timestamp" == "Timestamp")) %>%
+  select(total_comfortability, childhood_people, current_people) %>%
+  mutate(childhood_people_short = sub("\\-.*", "", childhood_people),
+         current_people_short = sub("\\-.*", "", current_people)) %>%
+  drop_na() %>%
+  group_by(childhood_people_short) |>
+  summarise(mean_comfortability = mean(total_comfortability), 
+            sd_comfortability = sd(total_comfortability),
+            n = n()) 
+```
+```{r}
+cleaned_political_discourse %>%
+  left_join(close_interaction_table, by = join_by("Timestamp" == "Timestamp")) %>%
+  select(total_comfortability, childhood_people, current_people) %>%
+  mutate(childhood_people_short = sub("\\-.*", "", childhood_people),
+         current_people_short = sub("\\-.*", "", current_people)) %>%
+  drop_na() %>%
+  group_by(current_people_short) |>
+  summarise(mean_comfortability = mean(total_comfortability), 
+            sd_comfortability = sd(total_comfortability),
+            n = n()) 
 ```
 
